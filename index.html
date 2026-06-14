@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Post Designer</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#f4f4f4;
+  text-align:center;
+  margin:0;
+  padding:20px;
+}
+
+.box{
+  display:flex;
+  gap:20px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.panel{
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  width:300px;
+}
+
+input, textarea, button{
+  width:100%;
+  margin:6px 0;
+  padding:8px;
+}
+
+canvas{
+  border-radius:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.2);
+}
+
+button{
+  background:#534AB7;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Social Media Post Designer</h2>
+
+<div class="box">
+
+<div class="panel">
+<h3>Edit Content</h3>
+
+<input id="handle" value="@yourbrand" oninput="draw()" />
+<input id="title" value="Your Brand Story Starts Here" oninput="draw()" />
+<textarea id="desc" oninput="draw()">Create amazing posts easily with this tool</textarea>
+<input id="cta" value="Learn More →" oninput="draw()" />
+
+<button onclick="download()">Download PNG</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const W = 1080;
+const H = 1080;
+
+canvas.width = 360;
+canvas.height = 360;
+
+function wrapText(text, x, y, maxWidth, lineHeight){
+  const words = text.split(" ");
+  let line = "";
+
+  for(let i=0;i<words.length;i++){
+    let test = line + words[i] + " ";
+    if(ctx.measureText(test).width > maxWidth){
+      ctx.fillText(line, x, y);
+      line = words[i] + " ";
+      y += lineHeight;
+    } else {
+      line = test;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
+function draw(w,h){
+
+  const handle = document.getElementById("handle").value;
+  const title = document.getElementById("title").value;
+  const desc = document.getElementById("desc").value;
+  const cta = document.getElementById("cta").value;
+
+  const scale = canvas.width / w;
+  ctx.setTransform(scale,0,0,scale,0,0);
+
+  // background
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0,"#534AB7");
+  grad.addColorStop(1,"#26215C");
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,w,h);
+
+  // text styles
+  ctx.fillStyle = "white";
+
+  ctx.font = "bold 60px Arial";
+  wrapText(title, 80, 220, w-160, 70);
+
+  ctx.font = "30px Arial";
+  wrapText(desc, 80, 420, w-160, 45);
+
+  ctx.font = "bold 28px Arial";
+  ctx.fillText(handle, 80, 120);
+
+  // CTA box
+  ctx.fillStyle = "white";
+  ctx.fillRect(80, H-150, 320, 70);
+
+  ctx.fillStyle = "#534AB7";
+  ctx.fillText(cta, 120, H-105);
+}
+
+function drawPreview(){
+  draw(W,H);
+}
+
+function download(){
+
+  const temp = document.createElement("canvas");
+  const tctx = temp.getContext("2d");
+
+  temp.width = W;
+  temp.height = H;
+
+  const handle = document.getElementById("handle").value;
+  const title = document.getElementById("title").value;
+  const desc = document.getElementById("desc").value;
+  const cta = document.getElementById("cta").value;
+
+  const grad = tctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,"#534AB7");
+  grad.addColorStop(1,"#26215C");
+
+  tctx.fillStyle = grad;
+  tctx.fillRect(0,0,W,H);
+
+  tctx.fillStyle = "white";
+
+  tctx.font = "bold 70px Arial";
+  wrapText(title, 80, 220, W-160, 80);
+
+  tctx.font = "35px Arial";
+  wrapText(desc, 80, 430, W-160, 50);
+
+  tctx.font = "bold 30px Arial";
+  tctx.fillText(handle, 80, 120);
+
+  tctx.fillStyle = "white";
+  tctx.fillRect(80, H-150, 350, 80);
+
+  tctx.fillStyle = "#534AB7";
+  tctx.fillText(cta, 130, H-100);
+
+  const a = document.createElement("a");
+  a.download = "post.png";
+  a.href = temp.toDataURL("image/png");
+  a.click();
+}
+
+drawPreview();
+</script>
+
+</body>
+</html>
